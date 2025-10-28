@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11', cache: 'pip' }
+      - run: pip install -r requirements.txt
+      - run: pytest -q --maxfail=1 --disable-warnings
+      - run: pip install pip-audit
+      - run: pip-audit || true   # segnala ma non blocca la PR per ora

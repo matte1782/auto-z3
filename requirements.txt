@@ -1,0 +1,9 @@
+streamlit>=1.35
+z3-solver>=4.13
+folium
+streamlit-folium
+pytest
+pytest-cov
+pip-audit
+pyyaml>=6.0
+

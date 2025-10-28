@@ -1,0 +1,32 @@
+# Python & virtual environment
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.venv/
+env/
+venv/
+ENV/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Streamlit cache
+.streamlit/
+
+# Test outputs & artifacts
+tests/_artifacts/
+*.smt2
+*.xml
+*.json
+
+# Temporary or generated data
+data/geo/*.geojson
+data/adj/*.json
+
+# Logs
+*.log
