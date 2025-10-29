@@ -1,3 +1,8 @@
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://auto-z3.streamlit.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Tests](https://github.com/matte1782/auto-z3/actions/workflows/python-ci.yml/badge.svg)](https://github.com/matte1782/auto-z3/actions)
+[![DOI](https://zenodo.org/badge/latestdoi/123456789.svg)](https://zenodo.org/)
+
 # Auto‑Z3: A Visual, No‑Code SAT & FOL Interface for Z3
 
 *An open educational toolkit for SAT and FOL experimentation*
