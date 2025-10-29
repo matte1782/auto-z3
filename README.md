@@ -1,5 +1,5 @@
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://auto-z3.streamlit.app)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.txt)
 
 # Auto‑Z3: A Visual, No‑Code SAT & FOL Interface for Z3
 
