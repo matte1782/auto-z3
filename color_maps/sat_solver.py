@@ -1,12 +1,15 @@
-# -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import re
 from typing import Dict, List, Tuple
+
 from z3_runner import run_z3_safely
+
 
 def exactly_one(*vars_for_region: List[str]) -> str:
     joined = " ".join(vars_for_region)
     return f"(and (or {joined}) ((_ at-most 1) {joined}))"
+
 
 def build_smt(graph: Dict, n_colors: int) -> str:
     regions: List[str] = graph["regions"]
@@ -24,15 +27,15 @@ def build_smt(graph: Dict, n_colors: int) -> str:
         lines.append(f"(assert {exactly_one(*color_vars)})\n")
 
     lines.append("; edges")
-    for (u, v) in edges:
+    for u, v in edges:
         for c in range(1, n_colors + 1):
             lines.append(f"(assert (not (and {u}{c} {v}{c})))")
     lines.append("(check-sat)")
     return "\n".join(lines)
 
-MODEL_BOOL_RE = re.compile(
-    r"\(\s*define-fun\s+([^\s]+)\s+\(\)\s+Bool\s+(true|false)\s*\)", re.M
-)
+
+MODEL_BOOL_RE = re.compile(r"\(\s*define-fun\s+([^\s]+)\s+\(\)\s+Bool\s+(true|false)\s*\)", re.M)
+
 
 def parse_model_to_assignment(model_text: str) -> Dict[str, int]:
     true_vars = []
@@ -47,6 +50,7 @@ def parse_model_to_assignment(model_text: str) -> Dict[str, int]:
         region, color_idx = m.group(1), int(m.group(2))
         assignment[region] = color_idx
     return assignment
+
 
 def solve_coloring(graph: Dict, n_colors: int) -> Tuple[str, Dict[str, int], str, str]:
     smt = build_smt(graph, n_colors)

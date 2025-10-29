@@ -1,0 +1,62 @@
+[project]
+name = "auto-z3"
+version = "0.9.0"
+description = "Auto-Z3: a visual, no-code interface for SAT and FOL on top of Z3 (Streamlit)."
+authors = [{ name = "Matteo Panzeri" }]
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["Z3", "SAT", "SMT", "FOL", "Streamlit", "education", "logic"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311"]
+skip-string-normalization = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+# E: pycodestyle, F: pyflakes, I: isort, B: flake8-bugbear, UP: pyupgrade
+select = ["E", "F", "I", "B", "UP"]
+# We keep things strict. No global ignores.
+ignore = []
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["auto_z3", "logic_core", "color_maps", "fol_core"]
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true
+
+# If you *must* keep a star import in app_zen_plus.py for now,
+# we narrowly ignore those two checks in that single file.
+[tool.ruff.lint.per-file-ignores]
+"app_zen_plus.py" = ["F403", "F405"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-q --disable-warnings"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = [
+  "venv/*",
+  ".venv/*",
+  "tests/*",
+  "scripts/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+precision = 1
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+# TEMPORARY: publish now, clean later
+ignore = ["UP006", "F401", "F403", "F405", "E401"]

@@ -1,9 +1,10 @@
 # ───────────────────────────────────────────────────────────────
 # conftest.py — setup test environment for Auto-Z3
 # ───────────────────────────────────────────────────────────────
+import json
 import os
 import sys
-import json
+
 import pytest
 
 # ✅ Fix: ensure the project root is visible for imports
@@ -17,6 +18,7 @@ if ROOT not in sys.path:
 DATA_GEO = os.path.join(ROOT, "data", "geo")
 DATA_ADJ = os.path.join(ROOT, "data", "adj")
 
+
 @pytest.fixture(scope="session")
 def paths():
     """Global test paths for fixtures and artifact output."""
@@ -29,16 +31,18 @@ def paths():
         "artifacts": os.path.join(ROOT, "tests", "_artifacts"),
     }
 
+
 @pytest.fixture(scope="session", autouse=True)
 def ensure_artifacts(paths):
     """Ensure artifact directory exists before running tests."""
     os.makedirs(paths["artifacts"], exist_ok=True)
 
+
 # ───────────────────────────────────────────────────────────────
 # Utility loader for adjacency JSON (handles both formats)
 # ───────────────────────────────────────────────────────────────
 def _load_adj(path):
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         obj = json.load(f)
 
     # Support both adjacency-list {A:[B,C]} and edge-list {"edges":[[A,B],...]}
@@ -55,10 +59,12 @@ def _load_adj(path):
     else:
         raise ValueError(f"Unsupported adjacency format in {path}")
 
+
 @pytest.fixture(scope="session")
 def south_adj(paths):
     """Adjacency for South America."""
     return _load_adj(paths["south_adj"])
+
 
 @pytest.fixture(scope="session")
 def central_adj(paths):

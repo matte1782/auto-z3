@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-import os, ast, sys
-from pathlib import Path
+import ast
+import sys
 from collections import defaultdict
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC_DIRS = [ROOT]  # scan whole repo
+
 
 def module_name_from_path(p: Path) -> str:
     rel = p.relative_to(ROOT).with_suffix("")
@@ -13,12 +15,17 @@ def module_name_from_path(p: Path) -> str:
         parts = parts[:-1]
     return ".".join(parts)
 
+
 def find_py_files():
     for d in SRC_DIRS:
         for p in d.rglob("*.py"):
-            if any(skip in p.parts for skip in (".venv", ".pytest_cache", "__pycache__", "tests", "data")):
+            if any(
+                skip in p.parts
+                for skip in (".venv", ".pytest_cache", "__pycache__", "tests", "data")
+            ):
                 continue
             yield p
+
 
 def parse_imports(p: Path):
     try:
@@ -34,6 +41,7 @@ def parse_imports(p: Path):
             if node.module:
                 mods.add(node.module.split(".")[0])
     return mods
+
 
 def main():
     files = list(find_py_files())
@@ -62,10 +70,12 @@ def main():
             if a in reachable:
                 for b in imps:
                     if b not in reachable:
-                        reachable.add(b); changed = True
+                        reachable.add(b)
+                        changed = True
             # Also add any module that imports a reachable module (looser union)
             if any(b in reachable for b in imps) and a not in reachable:
-                reachable.add(a); changed = True
+                reachable.add(a)
+                changed = True
 
     unreachable = [p for p, mod in mod_by_path.items() if mod not in reachable]
 
@@ -80,6 +90,7 @@ def main():
 
     print("\nNOTE: This is static and conservative. Review before deleting.")
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

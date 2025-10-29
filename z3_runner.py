@@ -1,12 +1,17 @@
 # z3_runner.py  — v2.1 (stable triple-return)
-import subprocess, tempfile, os, re
+import os
+import re
+import subprocess
+import tempfile
 from typing import Tuple
 
-STATUS_RE = re.compile(r'^(sat|unsat|unknown)\s*$', re.M)
+STATUS_RE = re.compile(r"^(sat|unsat|unknown)\s*$", re.M)
+
 
 def _extract_status(stdout: str) -> str:
     m = STATUS_RE.search(stdout or "")
     return m.group(1) if m else "error"
+
 
 def run_z3_safely(smt2_text: str, request_model: bool = True) -> Tuple[str, str, str]:
     """
@@ -26,7 +31,7 @@ def run_z3_safely(smt2_text: str, request_model: bool = True) -> Tuple[str, str,
     try:
         # 1) prima esecuzione per lo status
         p = subprocess.run(["z3", "-smt2", path], capture_output=True, text=True)
-        out = (p.stdout or "")
+        out = p.stdout or ""
         status = _extract_status(out)
 
         model = ""
@@ -35,7 +40,7 @@ def run_z3_safely(smt2_text: str, request_model: bool = True) -> Tuple[str, str,
             with open(path, "a", encoding="utf-8") as f2:
                 f2.write("(get-model)\n")
             p2 = subprocess.run(["z3", "-smt2", path], capture_output=True, text=True)
-            out2 = (p2.stdout or "")
+            out2 = p2.stdout or ""
             # Il modello inizia dalla prima parentesi aperta dopo la riga "sat"
             # (non è obbligatorio, ma rende l’output più pulito in UI)
             i = out2.find("(")

@@ -2,16 +2,27 @@
 # Adds dynamic language switching (🇬🇧/🇮🇹) with i18n.t()
 # No regressions to core behaviour (STRICT Builder, Presets, Coloring 3, Mappe nuovo, FOL beta, Tester)
 
-from typing import List, Tuple, Dict, Callable
+from typing import List
+
 import streamlit as st
 
 # Internationalisation
-from i18n import t, set_default_lang, get_default_lang
+from i18n import get_default_lang, set_default_lang, t
 
 # Core logic
 from logic_core import (
-    Node, Var, Not, And, Or, Implies, Iff, Xor, ExactlyOne,
-    emit_expr, declare_block, assert_line, check_sat, preamble_xor3
+    And,
+    Iff,
+    Implies,
+    Node,
+    Not,
+    Or,
+    Var,
+    Xor,
+    assert_line,
+    check_sat,
+    declare_block,
+    emit_expr,
 )
 from z3_runner import run_z3_safely
 
@@ -35,18 +46,25 @@ set_default_lang(lang)
 
 st.title(t("APP_TITLE"))
 
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ──────────────────────────────────────────────────────────────────────────────
 def help_info(txt: str):
     st.caption(f"ℹ️ {txt}")
 
+
 def badge_status(status: str) -> str:
-    if status == "sat": return t("SAT")
-    if status == "unsat": return t("UNSAT")
-    if status == "unknown": return t("UNKNOWN")
-    if status == "error": return "⚠️ " + t("ERROR")
+    if status == "sat":
+        return t("SAT")
+    if status == "unsat":
+        return t("UNSAT")
+    if status == "unknown":
+        return t("UNKNOWN")
+    if status == "error":
+        return "⚠️ " + t("ERROR")
     return status
+
 
 def render_output(smt: str, fname: str, status: str, model: str, raw: str):
     st.subheader(t("CHECK"))
@@ -59,8 +77,8 @@ def render_output(smt: str, fname: str, status: str, model: str, raw: str):
         st.code(raw, language="text")
     st.subheader(t("SMT2_GENERATED"))
     st.code(smt, language="lisp")
-    st.download_button(t("BTN_DOWNLOAD_SMT2"), data=smt,
-                       file_name=fname, mime="text/plain")
+    st.download_button(t("BTN_DOWNLOAD_SMT2"), data=smt, file_name=fname, mime="text/plain")
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Sidebar
@@ -76,7 +94,7 @@ mode = st.sidebar.selectbox(
         t("TAB_FOL_BETA"),
         t("TAB_TESTER"),
     ],
-    help="SMT-LIB v2 ready for Z3."
+    help="SMT-LIB v2 ready for Z3.",
 )
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -86,8 +104,7 @@ if mode == t("TAB_STRICT_BUILDER"):
     st.subheader(t("STRICT_TITLE"))
     help_info(t("STRICT_HELP"))
 
-    vars_line = st.text_input(t("BOOL_VARS"), value="p q r s",
-                              help="Declared as Bool in SMT-LIB.")
+    vars_line = st.text_input(t("BOOL_VARS"), value="p q r s", help="Declared as Bool in SMT-LIB.")
     vars_ = [v for v in vars_line.split() if v]
     cur_sig = " ".join(vars_)
 
@@ -102,7 +119,8 @@ if mode == t("TAB_STRICT_BUILDER"):
     if "pool_rev" not in st.session_state:
         st.session_state.pool_rev = 0
 
-    def bump_pool_rev(): st.session_state.pool_rev += 1
+    def bump_pool_rev():
+        st.session_state.pool_rev += 1
 
     # sync pool
     if st.session_state.vars_sig != cur_sig:
@@ -111,7 +129,9 @@ if mode == t("TAB_STRICT_BUILDER"):
         st.session_state.pool = vars_.copy() + preserved
         st.session_state.vars_sig = cur_sig
         st.session_state.phi_idx = min(st.session_state.phi_idx, len(st.session_state.pool) - 1)
-        st.session_state.prem_ids = [i for i in st.session_state.prem_ids if i < len(st.session_state.pool)]
+        st.session_state.prem_ids = [
+            i for i in st.session_state.prem_ids if i < len(st.session_state.pool)
+        ]
         bump_pool_rev()
 
     colL, colR = st.columns([1.1, 1])
@@ -146,27 +166,33 @@ if mode == t("TAB_STRICT_BUILDER"):
                 try:
                     if op == "Not":
                         if len(items) != 1:
-                            st.warning(t("ERR_NOT_ARITY")); raise ValueError
+                            st.warning(t("ERR_NOT_ARITY"))
+                            raise ValueError
                         newf = Not(items[0])
                     elif op == "And":
                         if len(items) < 2:
-                            st.warning(t("ERR_AND_ARITY")); raise ValueError
+                            st.warning(t("ERR_AND_ARITY"))
+                            raise ValueError
                         newf = And(*items)
                     elif op == "Or":
                         if len(items) < 2:
-                            st.warning(t("ERR_OR_ARITY")); raise ValueError
+                            st.warning(t("ERR_OR_ARITY"))
+                            raise ValueError
                         newf = Or(*items)
                     elif op == "Implies":
                         if len(items) != 2:
-                            st.warning(t("ERR_BIN_ARITY", op="IMPLIES")); raise ValueError
+                            st.warning(t("ERR_BIN_ARITY", op="IMPLIES"))
+                            raise ValueError
                         newf = Implies(items[0], items[1])
                     elif op == "Iff":
                         if len(items) != 2:
-                            st.warning(t("ERR_BIN_ARITY", op="IFF")); raise ValueError
+                            st.warning(t("ERR_BIN_ARITY", op="IFF"))
+                            raise ValueError
                         newf = Iff(items[0], items[1])
                     else:
                         if len(items) != 2:
-                            st.warning(t("ERR_BIN_ARITY", op="XOR")); raise ValueError
+                            st.warning(t("ERR_BIN_ARITY", op="XOR"))
+                            raise ValueError
                         newf = Xor(items[0], items[1])
                     st.session_state.pool.append(newf)
                     bump_pool_rev()
@@ -198,9 +224,11 @@ if mode == t("TAB_STRICT_BUILDER"):
         if 0 <= st.session_state.phi_idx < len(st.session_state.pool):
             phi = st.session_state.pool[st.session_state.phi_idx]
             phi_smt = emit_expr(phi)
-            st.markdown("**" + t("PHI_SMT") + ":**"); st.code(phi_smt, language="lisp")
+            st.markdown("**" + t("PHI_SMT") + ":**")
+            st.code(phi_smt, language="lisp")
         else:
-            st.error(t("ERR_PHI_INDEX")); st.stop()
+            st.error(t("ERR_PHI_INDEX"))
+            st.stop()
 
         prem_nodes = [st.session_state.pool[i] for i in st.session_state.prem_ids]
         if prem_nodes:
@@ -226,11 +254,21 @@ if mode == t("TAB_STRICT_BUILDER"):
             st.caption("Ψ — " + t("PSI_DSL"))
             psi_str = st.text_input(t("PSI_DSL"), value="Implies(p,q)")
             env = {v: Var(v) for v in vars_}
-            env.update({"Not":Not,"And":And,"Or":Or,"Implies":Implies,"Iff":Iff,"Xor":Xor})
+            env.update(
+                {
+                    "Not": Not,
+                    "And": And,
+                    "Or": Or,
+                    "Implies": Implies,
+                    "Iff": Iff,
+                    "Xor": Xor,
+                }
+            )
             psi = None
             try:
                 psi = eval(psi_str, {"__builtins__": {}}, env)
-                st.caption(t("PSI_PREVIEW")); st.code(emit_expr(psi), language="lisp")
+                st.caption(t("PSI_PREVIEW"))
+                st.code(emit_expr(psi), language="lisp")
             except Exception as ex:
                 st.warning(t("ERR_PSI", err=ex))
             extras["psi"] = psi
@@ -240,7 +278,8 @@ if mode == t("TAB_STRICT_BUILDER"):
             body = [assert_line(emit_expr(n)) for n in prem_nodes]
 
             if task.startswith("SAT"):
-                if extras.get("include_phi", True): body.append(assert_line(phi_smt))
+                if extras.get("include_phi", True):
+                    body.append(assert_line(phi_smt))
                 body.append(check_sat())
                 smt = "\n".join([decls, "\n".join(body)])
                 status, model, raw = run_z3_safely(smt, request_model=getm)
@@ -275,6 +314,7 @@ if mode == t("TAB_STRICT_BUILDER"):
 # ──────────────────────────────────────────────────────────────────────────────
 elif mode == t("TAB_COLOR_MAPS_NEW"):
     from color_maps import render_color_maps_page
+
     render_color_maps_page()
 
 elif mode == t("TAB_FOL_BETA"):

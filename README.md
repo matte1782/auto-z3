@@ -268,3 +268,7 @@ Auto‑Z3 was conceived and implemented by **Matteo Panzeri**.  Some boilerplat
 ---
 
 Thank you for exploring **Auto‑Z3**.  We hope it becomes a valuable tool in your logic courses, workshops and research projects.
+
+## Acknowledgments
+
+This project was inspired by the *Computational Logic* course at the University of Milan (Università degli Studi di Milano).

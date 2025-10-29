@@ -1,7 +1,9 @@
 import streamlit as st
 
+
 def inject_theme():
-    st.markdown("""
+    st.markdown(
+        """
     <style>
       /* look & feel ispirato a HIG: aria, gerarchia, focus sulle azioni */
       .main > div { padding-top: 0.5rem; }
@@ -12,4 +14,6 @@ def inject_theme():
       .info-badge{ background:#EEF2FF; color:#1E3A8A; border-radius: 999px; padding: 0.15rem 0.6rem; font-weight:600; }
       code { font-size: 0.92rem; }
     </style>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )

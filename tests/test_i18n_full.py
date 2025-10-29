@@ -9,8 +9,10 @@ Goals:
 """
 
 import re
+
 import pytest
-from i18n import t, set_default_lang, get_default_lang, LANGS, _MESSAGES
+
+from i18n import _MESSAGES, LANGS, get_default_lang, set_default_lang, t
 
 
 @pytest.mark.parametrize("lang", LANGS)

@@ -3,14 +3,17 @@
 # UI labels are intentionally minimal here; bilingual text is handled in the Streamlit UI.
 from __future__ import annotations
 
-from typing import Dict, Any
+from typing import Any, Dict
+
 import folium
 from streamlit_folium import st_folium
 
 from .color_apply import inject_colors
 
 
-def render_sat_map(geojson_path: str, assignment: Dict[str, int], height: int = 640) -> Dict[str, Any] | None:
+def render_sat_map(
+    geojson_path: str, assignment: Dict[str, int], height: int = 640
+) -> Dict[str, Any] | None:
     """
     Render a Folium map in Streamlit using a given color assignment.
 

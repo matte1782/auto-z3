@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 validate_benchmarks.py
 Independent validator for Auto-Z3 benchmarks and artifacts.
@@ -32,18 +31,24 @@ try:
 except Exception:
     try:
         from importlib.machinery import SourceFileLoader
+
         zr_path = REPO_ROOT / "z3_runner.py"
         if not zr_path.exists():
             raise FileNotFoundError(f"z3_runner.py not found at {zr_path}")
         z3_mod = SourceFileLoader("z3_runner", str(zr_path)).load_module()
         run_z3_safely = z3_mod.run_z3_safely  # type: ignore[attr-defined]
     except Exception as ex:
-        print("[validator] FATAL: cannot import z3_runner.run_z3_safely:", ex, file=sys.stderr)
+        print(
+            "[validator] FATAL: cannot import z3_runner.run_z3_safely:",
+            ex,
+            file=sys.stderr,
+        )
         sys.exit(2)
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Discovery
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def discover_smt2(root: str) -> List[str]:
     out = []
@@ -53,36 +58,46 @@ def discover_smt2(root: str) -> List[str]:
                 out.append(os.path.join(d, fn))
     return sorted(out)
 
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Tiny SMT-LIB tokenizer + parser
 # ──────────────────────────────────────────────────────────────────────────────
 
 _TOKEN = re.compile(r"""\s*(;[^\n]*\n|[()]|"(?:[^"\\]|\\.)*"|[^\s()]+)""")
 
+
 def _tokenize(s: str) -> List[str]:
     tokens, pos = [], 0
     while pos < len(s):
         m = _TOKEN.match(s, pos)
-        if not m: break
-        tok = m.group(1); pos = m.end()
-        if not tok.strip(): continue
+        if not m:
+            break
+        tok = m.group(1)
+        pos = m.end()
+        if not tok.strip():
+            continue
         if tok.startswith(";"):  # comment
             continue
         tokens.append(tok)
     return tokens
 
+
 def _parse(tokens: List[str], i: int = 0) -> Tuple[Any, int]:
-    if i >= len(tokens): raise ValueError("Unexpected EOF")
+    if i >= len(tokens):
+        raise ValueError("Unexpected EOF")
     t = tokens[i]
     if t == "(":
         out, i = [], i + 1
         while i < len(tokens) and tokens[i] != ")":
             node, i = _parse(tokens, i)
             out.append(node)
-        if i >= len(tokens) or tokens[i] != ")": raise ValueError("Unbalanced parens")
+        if i >= len(tokens) or tokens[i] != ")":
+            raise ValueError("Unbalanced parens")
         return out, i + 1
-    if t == ")": raise ValueError("Unexpected ')'")
+    if t == ")":
+        raise ValueError("Unexpected ')'")
     return t, i + 1
+
 
 def parse_smt2(s: str) -> List[Any]:
     tokens = _tokenize(s)
@@ -92,21 +107,25 @@ def parse_smt2(s: str) -> List[Any]:
         exprs.append(node)
     return exprs
 
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Model parsing
 # ──────────────────────────────────────────────────────────────────────────────
 
 _MODEL_BOOL = re.compile(
     r"\(define-fun\s+([A-Za-z0-9_\-\.]+)\s+\(\)\s+Bool\s+(true|false)\s*\)",
-    re.MULTILINE
+    re.MULTILINE,
 )
+
 
 def parse_bool_model(model_text: str) -> Dict[str, bool]:
     return {sym: (val == "true") for sym, val in _MODEL_BOOL.findall(model_text or "")}
 
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Evaluator (Bool subset)
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 class EvalEnv:
     def __init__(self, model: Dict[str, bool]):
@@ -117,20 +136,24 @@ class EvalEnv:
         self.fun_defs[name] = (arg_names, body)
 
     def _lookup(self, sym: str) -> bool:
-        if sym in self.model: return self.model[sym]
+        if sym in self.model:
+            return self.model[sym]
         self.model[sym] = False  # default false if missing
         return False
 
     def eval(self, sexpr: Any) -> bool:
         if isinstance(sexpr, str):
-            if sexpr in ("true", "false"): return sexpr == "true"
+            if sexpr in ("true", "false"):
+                return sexpr == "true"
             return self._lookup(sexpr)
         if not isinstance(sexpr, list) or not sexpr:
             raise ValueError(f"Bad node: {sexpr}")
         op, args = sexpr[0], sexpr[1:]
 
-        if op == "true": return True
-        if op == "false": return False
+        if op == "true":
+            return True
+        if op == "false":
+            return False
         if op == "not":
             assert len(args) == 1
             return not self.eval(args[0])
@@ -166,8 +189,10 @@ class EvalEnv:
                 return self.eval(body)
             finally:
                 for n, old in saved.items():
-                    if old is None: self.model.pop(n, None)
-                    else: self.model[n] = old
+                    if old is None:
+                        self.model.pop(n, None)
+                    else:
+                        self.model[n] = old
 
         # variable fallback
         if isinstance(op, str):
@@ -175,11 +200,15 @@ class EvalEnv:
 
         raise ValueError(f"Unsupported operator: {op}")
 
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Extractors
 # ──────────────────────────────────────────────────────────────────────────────
 
-def collect_asserts_and_defs(exprs: List[Any]) -> Tuple[List[Any], List[Tuple[str, List[str], Any]]]:
+
+def collect_asserts_and_defs(
+    exprs: List[Any],
+) -> Tuple[List[Any], List[Tuple[str, List[str], Any]]]:
     asserts, fun_defs = [], []
     for e in exprs:
         if isinstance(e, list) and e:
@@ -193,6 +222,7 @@ def collect_asserts_and_defs(exprs: List[Any]) -> Tuple[List[Any], List[Tuple[st
                 args = [p[0] for p in arg_decl] if isinstance(arg_decl, list) else []
                 fun_defs.append((name, args, body))
     return asserts, fun_defs
+
 
 def maybe_extract_map_graph(exprs: List[Any]) -> Tuple[set, set, int]:
     nodes, edges, K = set(), set(), -1
@@ -217,30 +247,38 @@ def maybe_extract_map_graph(exprs: List[Any]) -> Tuple[set, set, int]:
                     if isinstance(a, str) and isinstance(b, str):
                         u, v = sorted((_base(a), _base(b)))
                         if u != v:
-                            edges.add((u, v)); nodes.update([u, v])
+                            edges.add((u, v))
+                            nodes.update([u, v])
     return nodes, edges, K
+
 
 def max_clique_lower_bound(nodes: set, edges: set, max_try: int = 6) -> int:
     from itertools import combinations
+
     adj = {u: set() for u in nodes}
     for u, v in edges:
-        adj[u].add(v); adj[v].add(u)
+        adj[u].add(v)
+        adj[v].add(u)
     best = 1
     nl = sorted(nodes)
     for r in range(2, max_try + 1):
         for comb in combinations(nl, r):
-            if all((comb[j] in adj[comb[i]]) for i in range(r) for j in range(i+1, r)):
+            if all((comb[j] in adj[comb[i]]) for i in range(r) for j in range(i + 1, r)):
                 best = r
     return best
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Validation
 # ──────────────────────────────────────────────────────────────────────────────
 
-class ValidationError(Exception): pass
+
+class ValidationError(Exception):
+    pass
+
 
 def validate_instance(path: str, fail_on_warn: bool = False) -> None:
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         smt = f.read()
 
     status, model_txt, raw = run_z3_safely(smt, request_model=True)
@@ -251,7 +289,7 @@ def validate_instance(path: str, fail_on_warn: bool = False) -> None:
     if status == "sat":
         model = parse_bool_model(model_txt)
         env = EvalEnv(model)
-        for (n, args, body) in fun_defs:
+        for n, args, body in fun_defs:
             env.define_fun(n, args, body)
 
         for i, a in enumerate(asserts, 1):
@@ -267,10 +305,14 @@ def validate_instance(path: str, fail_on_warn: bool = False) -> None:
         if nodes and edges and K >= 0:
             clique_lb = max_clique_lower_bound(nodes, edges, max_try=6)
             if clique_lb > K:
-                print(f"[OK] {os.path.basename(path)} — UNSAT consistent (K={K} < clique {clique_lb}).")
+                print(
+                    f"[OK] {os.path.basename(path)} — UNSAT consistent (K={K} < clique {clique_lb})."
+                )
             else:
-                msg = (f"[WARN] {os.path.basename(path)} — UNSAT but clique lower bound "
-                       f"is {clique_lb} with K={K}. Review recommended.")
+                msg = (
+                    f"[WARN] {os.path.basename(path)} — UNSAT but clique lower bound "
+                    f"is {clique_lb} with K={K}. Review recommended."
+                )
                 print(msg)
                 if fail_on_warn:
                     raise ValidationError(msg)
@@ -280,14 +322,24 @@ def validate_instance(path: str, fail_on_warn: bool = False) -> None:
     else:
         raise ValidationError(f"[ERROR] {os.path.basename(path)} — Solver status: {status}\n{raw}")
 
+
 # ──────────────────────────────────────────────────────────────────────────────
 # CLI
 # ──────────────────────────────────────────────────────────────────────────────
 
+
 def main():
     ap = argparse.ArgumentParser(description="Validate Auto-Z3 benchmarks/models independently.")
-    ap.add_argument("--bench-dir", default="tests/_artifacts", help="Directory to scan for .smt2 files")
-    ap.add_argument("--fail-on-warn", action="store_true", help="Treat UNSAT consistency warnings as failures")
+    ap.add_argument(
+        "--bench-dir",
+        default="tests/_artifacts",
+        help="Directory to scan for .smt2 files",
+    )
+    ap.add_argument(
+        "--fail-on-warn",
+        action="store_true",
+        help="Treat UNSAT consistency warnings as failures",
+    )
     args = ap.parse_args()
 
     smt_files = discover_smt2(args.bench_dir)
@@ -311,6 +363,7 @@ def main():
         sys.exit(1)
     print("[validator] All benchmark instances validated successfully.")
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

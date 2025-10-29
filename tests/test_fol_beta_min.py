@@ -4,8 +4,10 @@
 
 from z3_runner import run_z3_safely
 
+
 def _run(smt: str, get_model: bool = False):
     return run_z3_safely(smt, request_model=get_model)
+
 
 def test_fol_universal_implication_unsat():
     """
@@ -24,6 +26,7 @@ def test_fol_universal_implication_unsat():
     status, model, raw = _run(smt, get_model=False)
     assert status == "unsat", f"Expected UNSAT, got {status}.\n{raw}"
 
+
 def test_fol_exists_sat():
     """
     ∃x P(x) is SAT when domain is non-empty and P is unconstrained.
@@ -40,6 +43,7 @@ def test_fol_exists_sat():
     assert status == "sat", f"Expected SAT, got {status}.\n{raw}"
     assert "(define-fun P" in model, "Model should interpret predicate P."
 
+
 def test_fol_binary_predicate_consistency_unsat():
     """
     Add a binary predicate R/2 with functional inconsistency:
@@ -55,4 +59,6 @@ def test_fol_binary_predicate_consistency_unsat():
 (check-sat)
 """
     status, model, raw = _run(smt, get_model=False)
-    assert status == "unsat", f"Expected UNSAT for inconsistent binary predicate theory, got {status}.\n{raw}"
+    assert status == "unsat", (
+        f"Expected UNSAT for inconsistent binary predicate theory, got {status}.\n{raw}"
+    )

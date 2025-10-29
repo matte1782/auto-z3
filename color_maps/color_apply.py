@@ -5,10 +5,15 @@ from __future__ import annotations
 import json
 from typing import Dict, List
 
-
 APPLE_PALETTE: List[str] = [
-    "#F94144", "#F8961E", "#F9C74F", "#90BE6D",
-    "#43AA8B", "#577590", "#277DA1", "#9B5DE5",
+    "#F94144",
+    "#F8961E",
+    "#F9C74F",
+    "#90BE6D",
+    "#43AA8B",
+    "#577590",
+    "#277DA1",
+    "#9B5DE5",
 ]
 
 
@@ -37,7 +42,7 @@ def inject_colors(
           - "FILL": hex color for the region
           - "STROKE": hex color for borders (constant dark gray)
     """
-    with open(geojson_path, "r", encoding="utf-8") as f:
+    with open(geojson_path, encoding="utf-8") as f:
         gj = json.load(f)
 
     features = gj.get("features", [])

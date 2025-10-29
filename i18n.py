@@ -9,6 +9,7 @@
 #   - Format placeholders use .format(**kwargs); on mismatch, returns raw text
 
 from __future__ import annotations
+
 from typing import Dict
 
 LANGS = ("en", "it")
@@ -42,7 +43,6 @@ def t(key: str, lang: str | None = None, **fmt) -> str:
 # TRANSLATION DICTIONARY
 # ──────────────────────────────────────────────────────────────────────────────
 _MESSAGES: Dict[str, Dict[str, str]] = {
-
     # ── APP GLOBAL ────────────────────────────────────────────────────────────
     "APP_TITLE": {
         "en": "Auto-Z3 — Visual, No-Code SAT & FOL for Z3",
@@ -67,7 +67,6 @@ _MESSAGES: Dict[str, Dict[str, str]] = {
         "en": "Created new sub-formula at index {idx}.",
         "it": "Creata in coda la sotto-formula indice {idx}.",
     },
-
     # ── SIDEBAR MODES / TABS ─────────────────────────────────────────────────
     "MODES_HEADER": {"en": "Modes", "it": "Modalità"},
     "CHOOSE_MODE": {"en": "Choose a mode", "it": "Scegli la modalità"},
@@ -77,7 +76,6 @@ _MESSAGES: Dict[str, Dict[str, str]] = {
     "TAB_COLOR_MAPS_NEW": {"en": "Color Maps (new)", "it": "Colora Mappe (nuovo)"},
     "TAB_FOL_BETA": {"en": "FOL (beta)", "it": "FOL (beta)"},
     "TAB_TESTER": {"en": "Quick Tester", "it": "Tester veloce"},
-
     # ── BUILDER (STRICT) ─────────────────────────────────────────────────────
     "STRICT_TITLE": {
         "en": "Visual builder for nested formulas",
@@ -141,21 +139,41 @@ _MESSAGES: Dict[str, Dict[str, str]] = {
     "PREMISES": {"en": "Premises", "it": "Premesse (0..N indici dal pool)"},
     "PREVIEW": {"en": "Preview", "it": "Anteprima"},
     "PHI_SMT": {"en": "Φ (SMT-LIB)", "it": "Φ (SMT-LIB)"},
-    "NO_PREMISES": {"en": "No premises selected.", "it": "Nessuna premessa selezionata."},
+    "NO_PREMISES": {
+        "en": "No premises selected.",
+        "it": "Nessuna premessa selezionata.",
+    },
     "TASK_ON_PHI": {"en": "Task on Φ", "it": "Task su Φ"},
     "TASK_SELECT": {"en": "Select a task", "it": "Seleziona task"},
     "TASK_SAT": {"en": "SAT (premises ∧ optional Φ)", "it": "SAT (premesse ∧ opz. Φ)"},
-    "TASK_INFERENCE": {"en": "Inference (Premises ⊢ Φ)", "it": "Inferenza (Premesse ⊢ Φ)"},
-    "TASK_TAUTOLOGY": {"en": "Tautology (assert (not Φ))", "it": "Tautologia (assert (not Φ))"},
-    "TASK_EQUIV": {"en": "Equivalence (Φ = Ψ) [with premises]", "it": "Equivalenza (Φ = Ψ) [con premesse]"},
-    "ASK_MODEL": {"en": "Request model (only if SAT)", "it": "Richiedi modello (solo se SAT)"},
-    "INCLUDE_PHI": {"en": "Also include Φ among asserts", "it": "Includi anche Φ tra gli assert"},
+    "TASK_INFERENCE": {
+        "en": "Inference (Premises ⊢ Φ)",
+        "it": "Inferenza (Premesse ⊢ Φ)",
+    },
+    "TASK_TAUTOLOGY": {
+        "en": "Tautology (assert (not Φ))",
+        "it": "Tautologia (assert (not Φ))",
+    },
+    "TASK_EQUIV": {
+        "en": "Equivalence (Φ = Ψ) [with premises]",
+        "it": "Equivalenza (Φ = Ψ) [con premesse]",
+    },
+    "ASK_MODEL": {
+        "en": "Request model (only if SAT)",
+        "it": "Richiedi modello (solo se SAT)",
+    },
+    "INCLUDE_PHI": {
+        "en": "Also include Φ among asserts",
+        "it": "Includi anche Φ tra gli assert",
+    },
     "PSI_DSL": {"en": "Ψ (DSL)", "it": "Ψ (DSL)"},
     "PSI_PREVIEW": {"en": "Ψ preview (SMT-LIB)", "it": "Anteprima Ψ (SMT-LIB)"},
     "ERR_PSI": {"en": "Invalid Ψ: {err}", "it": "Ψ non valida: {err}"},
-    "BTN_RUN_Z3": {"en": "▶️ Generate & Check with Z3", "it": "▶️ Genera & Verifica con Z3"},
+    "BTN_RUN_Z3": {
+        "en": "▶️ Generate & Check with Z3",
+        "it": "▶️ Genera & Verifica con Z3",
+    },
     "ERR_PHI_INDEX": {"en": "Invalid Φ index.", "it": "Indice Φ non valido."},
-
     # ── COLOR MAPS (UI) ───────────────────────────────────────────────────────
     "MAPS_TITLE": {"en": "Color Maps — SAT", "it": "Colora Mappe — SAT"},
     "SELECT_MAP": {"en": "Select map", "it": "Seleziona mappa"},
@@ -167,40 +185,84 @@ _MESSAGES: Dict[str, Dict[str, str]] = {
     },
     "SMT2_TITLE": {"en": "Generated SMT-LIB v2", "it": "SMT-LIB v2 generato"},
     "MODEL_Z3_EXTRACT": {"en": "Z3 model (extract)", "it": "Modello Z3 (estratto)"},
-    "ASSIGNMENT_ISO_TO_COLOR": {"en": "Assignment (ISO_A3 → color)", "it": "Assegnamento (ISO_A3 → colore)"},
+    "ASSIGNMENT_ISO_TO_COLOR": {
+        "en": "Assignment (ISO_A3 → color)",
+        "it": "Assegnamento (ISO_A3 → colore)",
+    },
     "FOLIUM_PREVIEW": {"en": "Preview (Folium)", "it": "Anteprima (Folium)"},
     "PREVIEW_ERROR": {"en": "Preview unavailable", "it": "Anteprima non disponibile"},
     "SOLVING_WITH_Z3": {"en": "Solving with Z3…", "it": "Risoluzione con Z3…"},
     "BTN_DOWNLOAD_SMT2": {"en": "⬇️ Download .smt2", "it": "⬇️ Scarica .smt2"},
-    "SOUTH_AMERICA_COUNTRIES": {"en": "South America (Countries)", "it": "Sud America (Paesi)"},
-    "CENTRAL_AMERICA_COUNTRIES": {"en": "Central America (Countries)", "it": "America Centrale (Paesi)"},
-
+    "SOUTH_AMERICA_COUNTRIES": {
+        "en": "South America (Countries)",
+        "it": "Sud America (Paesi)",
+    },
+    "CENTRAL_AMERICA_COUNTRIES": {
+        "en": "Central America (Countries)",
+        "it": "America Centrale (Paesi)",
+    },
     # ── FOL (BETA) ────────────────────────────────────────────────────────────
-    "FOL_TITLE": {"en": "First-Order Logic (βeta) — Quantifiers & Predicates",
-                  "it": "First-Order Logic (βeta) — Quantificatori e Predicati"},
-    "FOL_HELP": {"en": "Configure sort, constants and predicates via a guided mini-DSL.",
-                 "it": "Configura sort, costanti e predicati tramite una mini-DSL guidata."},
+    "FOL_TITLE": {
+        "en": "First-Order Logic (βeta) — Quantifiers & Predicates",
+        "it": "First-Order Logic (βeta) — Quantificatori e Predicati",
+    },
+    "FOL_HELP": {
+        "en": "Configure sort, constants and predicates via a guided mini-DSL.",
+        "it": "Configura sort, costanti e predicati tramite una mini-DSL guidata.",
+    },
     "SORT_NAME": {"en": "Sort name (domain type)", "it": "Nome sort (tipo di dominio)"},
-    "DOMAIN_CONSTANTS": {"en": "Domain constants (space-separated)", "it": "Costanti di dominio (spazio-separate)"},
-    "PREDICATES_ARITY": {"en": "Predicates with arity (e.g. Student/1, Teaches/2)", "it": "Predicati con arità (es. Student/1, Teaches/2)"},
-    "ERR_PRED_FORMAT": {"en": "Malformed predicate: '{tok}' (use Name/Arity).", "it": "Predicato mal formattato: '{tok}' (usa Nome/Arity)."},
-    "ERR_ARITY_NUM": {"en": "Non-numeric arity in '{tok}'.", "it": "Arità non numerica in '{tok}'."},
+    "DOMAIN_CONSTANTS": {
+        "en": "Domain constants (space-separated)",
+        "it": "Costanti di dominio (spazio-separate)",
+    },
+    "PREDICATES_ARITY": {
+        "en": "Predicates with arity (e.g. Student/1, Teaches/2)",
+        "it": "Predicati con arità (es. Student/1, Teaches/2)",
+    },
+    "ERR_PRED_FORMAT": {
+        "en": "Malformed predicate: '{tok}' (use Name/Arity).",
+        "it": "Predicato mal formattato: '{tok}' (usa Nome/Arity).",
+    },
+    "ERR_ARITY_NUM": {
+        "en": "Non-numeric arity in '{tok}'.",
+        "it": "Arità non numerica in '{tok}'.",
+    },
     "TAB_FOL_SAT": {"en": "SAT / Model", "it": "SAT / Modello"},
-    "TAB_FOL_INFER": {"en": "Inference (Premises ⊢ Conclusion)", "it": "Inferenza (Premesse ⊢ Conclusione)"},
-    "FOL_EXAMPLE": {"en": "Example: `ForAll(['x'], Implies(Student(x), Attends(x,peter)))`",
-                    "it": "Esempio: `ForAll(['x'], Implies(Student(x), Attends(x,peter)))`"},
-    "PREMISES_ONE_PER_LINE": {"en": "Premises (one formula per line)", "it": "Premesse (una formula per riga)"},
-    "ASK_MODEL_IF_SAT": {"en": "Request model (only if SAT)", "it": "Richiedi modello (solo se SAT)"},
+    "TAB_FOL_INFER": {
+        "en": "Inference (Premises ⊢ Conclusion)",
+        "it": "Inferenza (Premesse ⊢ Conclusione)",
+    },
+    "FOL_EXAMPLE": {
+        "en": "Example: `ForAll(['x'], Implies(Student(x), Attends(x,peter)))`",
+        "it": "Esempio: `ForAll(['x'], Implies(Student(x), Attends(x,peter)))`",
+    },
+    "PREMISES_ONE_PER_LINE": {
+        "en": "Premises (one formula per line)",
+        "it": "Premesse (una formula per riga)",
+    },
+    "ASK_MODEL_IF_SAT": {
+        "en": "Request model (only if SAT)",
+        "it": "Richiedi modello (solo se SAT)",
+    },
     "BTN_FOL_SAT": {"en": "▶️ Check FOL (SAT)", "it": "▶️ Verifica FOL (SAT)"},
-    "ERR_MINIDSL": {"en": "Mini-DSL error: {err}", "it": "Errore nella mini-DSL: {err}"},
-    "FOL_INFERENCE_HELP": {"en": "Inference: assert(Premises) ∧ assert(not Conclusion) ⇒ `unsat` if valid.",
-                           "it": "Inferenza: assert(Premesse) ∧ assert(not Conclusione) ⇒ `unsat` se valida."},
-    "BTN_FOL_INFER": {"en": "▶️ Check FOL (Inference)", "it": "▶️ Verifica FOL (Inferenza)"},
+    "ERR_MINIDSL": {
+        "en": "Mini-DSL error: {err}",
+        "it": "Errore nella mini-DSL: {err}",
+    },
+    "FOL_INFERENCE_HELP": {
+        "en": "Inference: assert(Premises) ∧ assert(not Conclusion) ⇒ `unsat` if valid.",
+        "it": "Inferenza: assert(Premesse) ∧ assert(not Conclusione) ⇒ `unsat` se valida.",
+    },
+    "BTN_FOL_INFER": {
+        "en": "▶️ Check FOL (Inference)",
+        "it": "▶️ Verifica FOL (Inferenza)",
+    },
     "CONCLUSION": {"en": "Conclusion", "it": "Conclusione"},
-
     # ── QUICK TESTER ──────────────────────────────────────────────────────────
     "TESTER_TITLE": {"en": "Quick SMT-LIB Tester", "it": "Tester veloce SMT-LIB"},
-    "TESTER_HELP": {"en": "Paste an SMT-LIB formula and check it with Z3. Model shown only if sat.",
-                    "it": "Incolla una formula SMT-LIB e verificala con Z3. Il modello è mostrato solo se sat."},
+    "TESTER_HELP": {
+        "en": "Paste an SMT-LIB formula and check it with Z3. Model shown only if sat.",
+        "it": "Incolla una formula SMT-LIB e verificala con Z3. Il modello è mostrato solo se sat.",
+    },
     "BTN_TESTER_CHECK": {"en": "▶️ Check", "it": "▶️ Verifica"},
 }

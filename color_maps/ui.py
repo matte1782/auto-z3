@@ -1,13 +1,17 @@
 # color_maps/ui.py — bilingual-safe (EN/IT), no-regression
-import os, json, re
+import json
+import os
+import re
+from typing import Dict, List, Tuple
+
 import streamlit as st
 
-from typing import List, Tuple, Dict
 from i18n import t  # UI strings only; logic/data remain language-agnostic
-from .solver import build_map_smt
+from z3_runner import run_z3_safely
+
 from .folium_sat import render_sat_map
 from .preview_folium import render_folium_preview
-from z3_runner import run_z3_safely
+from .solver import build_map_smt
 
 BASE_GEO = os.path.join("data", "geo")
 BASE_ADJ = os.path.join("data", "adj")
@@ -27,10 +31,8 @@ MAPS: Dict[str, Dict[str, str]] = {
 }
 
 # Extract (ISO, color_index) from Z3 model def-funs
-MODEL_VAR_RE = re.compile(
-    r"\(define-fun\s+([A-Z]{3})_(\d+)\s+\(\)\s+Bool\s+(true|false)\)",
-    re.I
-)
+MODEL_VAR_RE = re.compile(r"\(define-fun\s+([A-Z]{3})_(\d+)\s+\(\)\s+Bool\s+(true|false)\)", re.I)
+
 
 def _parse_assignment(model_text: str) -> Dict[str, int]:
     chosen: Dict[str, int] = {}
@@ -40,8 +42,9 @@ def _parse_assignment(model_text: str) -> Dict[str, int]:
             chosen[iso] = idx
     return chosen
 
+
 def _load_adjacency_pairs(adj_path: str) -> List[Tuple[str, str]]:
-    with open(adj_path, "r", encoding="utf-8") as f:
+    with open(adj_path, encoding="utf-8") as f:
         adj = json.load(f)  # dict ISO -> [neighbors...]
     edges = set()
     for u, nbrs in adj.items():
@@ -52,30 +55,43 @@ def _load_adjacency_pairs(adj_path: str) -> List[Tuple[str, str]]:
             edges.add((a, b))
     return sorted(edges)
 
+
 def _init_state():
     if "cmaps" not in st.session_state:
         st.session_state.cmaps = dict(
-            map_id=None, n_colors=None, geo=None, adj=None,
-            smt=None, status=None, model=None, assignment=None
+            map_id=None,
+            n_colors=None,
+            geo=None,
+            adj=None,
+            smt=None,
+            status=None,
+            model=None,
+            assignment=None,
         )
+
 
 def _patch_sa_k4(edges: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
     """Ensure the classic K4 {ARG,BRA,PRY,BOL} is present (teaching exercise)."""
-    must = {tuple(sorted(p)) for p in [
-        ("ARG", "BRA"),
-        ("ARG", "PRY"),
-        ("ARG", "BOL"),
-        ("BRA", "PRY"),
-        ("BRA", "BOL"),
-        ("PRY", "BOL"),
-    ]}
+    must = {
+        tuple(sorted(p))
+        for p in [
+            ("ARG", "BRA"),
+            ("ARG", "PRY"),
+            ("ARG", "BOL"),
+            ("BRA", "PRY"),
+            ("BRA", "BOL"),
+            ("PRY", "BOL"),
+        ]
+    }
     es = set(edges)
     es |= must
     return sorted(es)
 
+
 def _labels_for_select() -> Dict[str, str]:
     """Return map_id -> localized label using i18n keys."""
     return {mid: t(cfg["label_key"]) for mid, cfg in MAPS.items()}
+
 
 def render_color_maps_page():
     _init_state()
@@ -102,7 +118,7 @@ def render_color_maps_page():
             adj = MAPS[map_id]["adj"]
 
             # Load nodes (stable order)
-            with open(geo, "r", encoding="utf-8") as f:
+            with open(geo, encoding="utf-8") as f:
                 gj = json.load(f)
             nodes = [ft["properties"]["ISO_A3"] for ft in gj["features"]]
 
@@ -122,8 +138,14 @@ def render_color_maps_page():
 
             # Persist across reruns
             st.session_state.cmaps.update(
-                map_id=map_id, n_colors=n_colors, geo=geo, adj=adj,
-                smt=smt, status=status, model=model, assignment=assignment
+                map_id=map_id,
+                n_colors=n_colors,
+                geo=geo,
+                adj=adj,
+                smt=smt,
+                status=status,
+                model=model,
+                assignment=assignment,
             )
 
     # ── Persistent output
@@ -148,7 +170,7 @@ def render_color_maps_page():
             st.download_button(
                 t("BTN_DOWNLOAD_SMT2"),
                 data=saved["smt"],
-                file_name=f"{(labels.get(saved['map_id'], 'map')).replace(' ','_').lower()}_{saved['n_colors']}c.smt2",
+                file_name=f"{(labels.get(saved['map_id'], 'map')).replace(' ', '_').lower()}_{saved['n_colors']}c.smt2",
                 mime="text/plain",
                 use_container_width=True,
             )

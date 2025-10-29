@@ -1,32 +1,65 @@
-# Python & virtual environment
+# =============================
+# Auto-Z3 .gitignore (v0.9)
+# =============================
+
+# --- Python & Environment ---
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 *.so
+*.egg-info/
+.eggs/
+.env
 .venv/
-env/
 venv/
 ENV/
+env/
+pip-wheel-metadata/
+.cache/
 
-# IDE / Editor
+# --- IDE / Editor files ---
 .vscode/
 .idea/
 *.swp
+*.swo
 .DS_Store
+Thumbs.db
 
-# Streamlit cache
+# --- Streamlit cache & configs ---
 .streamlit/
+.streamlit/secrets.toml
 
-# Test outputs & artifacts
+# --- Tests & artifacts ---
 tests/_artifacts/
+pytest_cache/
+.coverage
+htmlcov/
 *.smt2
 *.xml
 *.json
+*.csv
 
-# Temporary or generated data
+# --- Data & generated outputs ---
 data/geo/*.geojson
 data/adj/*.json
-
-# Logs
+examples/*.geojson
+examples/*.smt2
 *.log
+
+# --- Build / Dist / Packaging ---
+build/
+dist/
+*.tar.gz
+*.whl
+
+# --- Notebooks / Docs / Reports ---
+.ipynb_checkpoints/
+*.ipynb
+docs/_build/
+docs/*.html
+
+# --- OS-specific ---
+ehthumbs.db
+Icon?
+Desktop.ini

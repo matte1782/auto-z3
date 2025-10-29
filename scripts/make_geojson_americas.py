@@ -11,16 +11,16 @@
 # Requisiti:
 #   pip install geopandas shapely requests
 
-import os
+import argparse
 import io
 import json
-import zipfile
-import argparse
+import os
 import tempfile
+import zipfile
 from typing import Dict, List, Set
 
-import requests
 import geopandas as gpd
+import requests
 from shapely.prepared import prep
 
 # Mirror affidabili di Natural Earth 1:50m
@@ -31,9 +31,20 @@ NE_URLS = [
 
 # ISO-A3 usati nei dataset (inclusi territori rilevanti ai confini)
 SOUTH_AMERICA = [
-    "ARG", "BOL", "BRA", "CHL", "COL", "ECU", "GUY", "PRY", "PER",
-    "SUR", "URY", "VEN", "GUF",  # French Guiana
-    "FLK"  # Falkland Islands (per completezza, non influenza la K4)
+    "ARG",
+    "BOL",
+    "BRA",
+    "CHL",
+    "COL",
+    "ECU",
+    "GUY",
+    "PRY",
+    "PER",
+    "SUR",
+    "URY",
+    "VEN",
+    "GUF",  # French Guiana
+    "FLK",  # Falkland Islands (per completezza, non influenza la K4)
 ]
 CENTRAL_AMERICA = ["MEX", "BLZ", "GTM", "SLV", "HND", "NIC", "CRI", "PAN"]
 
@@ -41,6 +52,7 @@ CENTRAL_AMERICA = ["MEX", "BLZ", "GTM", "SLV", "HND", "NIC", "CRI", "PAN"]
 # ──────────────────────────────────────────────────────────────────────────────
 # Download & Load
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def download_ne_admin0() -> bytes:
     last_err = None
@@ -52,6 +64,7 @@ def download_ne_admin0() -> bytes:
         except Exception as ex:
             last_err = ex
     raise RuntimeError(f"Impossibile scaricare Natural Earth. Ultimo errore: {last_err}")
+
 
 def load_gdf_from_zip(zip_bytes: bytes) -> gpd.GeoDataFrame:
     with tempfile.TemporaryDirectory() as td:
@@ -69,6 +82,7 @@ def load_gdf_from_zip(zip_bytes: bytes) -> gpd.GeoDataFrame:
 # ──────────────────────────────────────────────────────────────────────────────
 # Normalizzazione campi e filtri
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def normalize_fields(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     # ISO_A3
@@ -101,6 +115,7 @@ def normalize_fields(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     gdf = gdf.explode(index_parts=False, ignore_index=True)
     return gdf
 
+
 def filter_by_isos(gdf: gpd.GeoDataFrame, isos: List[str]) -> gpd.GeoDataFrame:
     g = gdf[gdf["ISO_A3"].isin(isos)].copy()
     g["geometry"] = g["geometry"].buffer(0)
@@ -112,6 +127,7 @@ def filter_by_isos(gdf: gpd.GeoDataFrame, isos: List[str]) -> gpd.GeoDataFrame:
 # ──────────────────────────────────────────────────────────────────────────────
 # Adiacenze su geometrie RAW + semplificazione per export
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def build_neighbors_raw(gdf_raw: gpd.GeoDataFrame) -> Dict[str, List[str]]:
     """
@@ -126,13 +142,14 @@ def build_neighbors_raw(gdf_raw: gpd.GeoDataFrame) -> Dict[str, List[str]]:
     neighbors: Dict[str, Set[str]] = {k: set() for k in keys}
     for i, a in enumerate(keys):
         pa = prepped[a]
-        for b in keys[i+1:]:
+        for b in keys[i + 1 :]:
             gb = geoms[b]
             if pa.touches(gb):
                 neighbors[a].add(b)
                 neighbors[b].add(a)
 
     return {k: sorted(list(v)) for k, v in neighbors.items()}
+
 
 def simplify_for_export(gdf_raw: gpd.GeoDataFrame, simplify_tol: float) -> gpd.GeoDataFrame:
     """
@@ -150,12 +167,15 @@ def simplify_for_export(gdf_raw: gpd.GeoDataFrame, simplify_tol: float) -> gpd.G
 # Utility I/O
 # ──────────────────────────────────────────────────────────────────────────────
 
+
 def ensure_dirs(out_geo: str, out_adj: str):
     os.makedirs(out_geo, exist_ok=True)
     os.makedirs(out_adj, exist_ok=True)
 
+
 def write_geojson(gdf: gpd.GeoDataFrame, path: str):
     gdf.to_file(path, driver="GeoJSON")
+
 
 def write_adj(adj: Dict[str, List[str]], path: str):
     with open(path, "w", encoding="utf-8") as f:
@@ -166,11 +186,17 @@ def write_adj(adj: Dict[str, List[str]], path: str):
 # Main
 # ──────────────────────────────────────────────────────────────────────────────
 
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="data/geo", help="cartella GeoJSON in uscita")
     ap.add_argument("--adj", default="data/adj", help="cartella adiacenze in uscita")
-    ap.add_argument("--simplify", type=float, default=0.05, help="tolleranza semplificazione (gradi)")
+    ap.add_argument(
+        "--simplify",
+        type=float,
+        default=0.05,
+        help="tolleranza semplificazione (gradi)",
+    )
     args = ap.parse_args()
 
     ensure_dirs(args.out, args.adj)
@@ -193,7 +219,11 @@ def main():
 
     # Sanity check: K4 in Sud America (ARG, BOL, BRA, PRY)
     must_edges = {("ARG", "BOL"), ("BOL", "BRA"), ("BRA", "PRY"), ("PRY", "ARG")}
-    missing = [e for e in must_edges if (e[1] not in sa_adj.get(e[0], [])) or (e[0] not in sa_adj.get(e[1], []))]
+    missing = [
+        e
+        for e in must_edges
+        if (e[1] not in sa_adj.get(e[0], [])) or (e[0] not in sa_adj.get(e[1], []))
+    ]
     if missing:
         raise RuntimeError(
             "Adjacency too sparse: missing K4 edges "

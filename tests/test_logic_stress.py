@@ -2,11 +2,14 @@
 import random
 import time
 from typing import List
-from logic_core import Var, emit_expr, declare_block, assert_line, check_sat
+
+from logic_core import assert_line, check_sat, declare_block
 from z3_runner import run_z3_safely
+
 
 def _run(smt: str, get_model: bool = False):
     return run_z3_safely(smt, request_model=get_model)
+
 
 def _mk_planted_sat_3cnf(n_vars: int, m_clauses: int, seed: int = 1337) -> str:
     """
@@ -39,6 +42,7 @@ def _mk_planted_sat_3cnf(n_vars: int, m_clauses: int, seed: int = 1337) -> str:
     lines.append(check_sat())
     return "\n".join(lines)
 
+
 def test_large_random_cnf_sat_scalability():
     """50 vars, 200 random 3-CNF clauses with planted solution ⇒ SAT, time bound sanity check."""
     smt = _mk_planted_sat_3cnf(n_vars=50, m_clauses=200, seed=2025)
@@ -50,10 +54,16 @@ def test_large_random_cnf_sat_scalability():
     # generous limit to avoid CI flakiness; adjust if machines are slow/fast
     assert dt < 5.0, f"Unexpected slowdown on planted 3-CNF (50/200): {dt:.2f}s"
 
+
 def test_trivial_contradiction_unsat():
     """Minimal UNSAT sanity check on large var sets: assert x and (not x)."""
     vars_ = [f"x{i}" for i in range(1, 51)]
-    lines = [declare_block(vars_), assert_line("x1"), assert_line("(not x1)"), check_sat()]
+    lines = [
+        declare_block(vars_),
+        assert_line("x1"),
+        assert_line("(not x1)"),
+        check_sat(),
+    ]
     smt = "\n".join(lines)
     status, model, raw = _run(smt, get_model=False)
     assert status == "unsat", f"Expected UNSAT for x ∧ ¬x, got {status}.\n{raw}"
