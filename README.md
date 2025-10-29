@@ -97,7 +97,7 @@ On first run, the app will download the Z3 Python bindings, load Streamlit and G
 
 The app displays the generated SMT‑LIB and the solver’s result.  Inferences are checked by adding `(not Φ)` to the premises; tautologies simply assert `(not Φ)` and look for UNSAT.
 
-*Screenshot placeholder*: `![SAT_example](/docs/img/sat_example.png)`
+*Screenshot placeholder*: `!SOON UPDATED'
 
 ### Map Colouring
 
@@ -106,7 +106,7 @@ The app displays the generated SMT‑LIB and the solver’s result.  Inferences 
 3. Select the number of colours (2–8).  By graph theory, 3 or 4 are typical for these maps.
 4. Click **Risolvi**.  If colourable, the map animates with a smooth fill; otherwise the solver reports UNSAT and the UI flashes red briefly.
 
-*Screenshot placeholder*: `![Map_colouring](/docs/img/map_colouring.png)`
+*Screenshot placeholder*: `!SOON UPDATED'
 
 ### FOL (Beta)
 
